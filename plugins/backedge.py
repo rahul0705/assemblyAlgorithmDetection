@@ -45,7 +45,7 @@ for block in fc:
 	break
 for edge in edges:
 	#print(edges[edge][1])
-	if edges[edge][1] is 1:
+	if edges[edge][1] is 2:
 		print "BLOCK: %x - %x [%d]:" % (edges[edge][2].startEA, edges[edge][3].startEA, edges[edge][2].id)
 		#print "BLOCK: %x - %x [%d]:" % (edges[edge][3].startEA, edges[edge][3].endEA, edges[edge][3].id)
 
