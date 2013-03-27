@@ -36,12 +36,10 @@ for block in fc:
 def dfs(graph, vertex):
 	graph[vertex][1] = 1
 	for node in graph[vertex][0]:
-		if edges[str(vertex) + str(node)][0] is 0:
-			if graph[node][1] is 0:
-				edges[str(vertex) + str(node)][0]
-				dfs(graph, node)
-			elif graph[node][1] is 1:	
-				edges[str(vertex) + str(node)][1] = 1
+		if graph[node][1] is 0:
+			dfs(graph, node)
+		elif graph[node][1] is 1:
+			graph[node][1] = 2
 for block in fc:
 	dfs(graph, block.id)
 	break
