@@ -30,4 +30,4 @@ print "Total instructions: %d" % (total_instr)
 
 f.close();
 		
-print "8===========Dcollect_instr_count.py has completed\n--------------------\n"
+print "collect_instr_count.py has completed\n--------------------\n"
