@@ -14,8 +14,11 @@ def DFS(G, v, l):
 				edge.status = 1
 				l = l + 1
 				DFS(G, w, l)
+				l = l - 1
 			elif w.status is 1 and w.level is not 0 and w.level <= v.level:
 				edge.status = 2
+	
+	
 
 				
 G = graph()
