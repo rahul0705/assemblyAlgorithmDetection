@@ -1,3 +1,5 @@
+from idaapi import *
+
 print "\n--------------------\nbackedge2.py has been started"
 
 #status = 0 -> Unexplored
