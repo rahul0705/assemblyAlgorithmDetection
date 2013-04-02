@@ -25,8 +25,8 @@ class edge:
 		self.status = 0
 		
 	def printEdge(self):
-		print "Source ID: %d Start: %x" % (self.srcV.block.id, self.srcV.block.startEA)
-		print "Destination ID: %d Start: %x" % (self.dstV.block.id, self.dstV.block.startEA)
+		print "Source ID: %d Address: %x" % (self.srcV.block.id, self.srcV.block.startEA)
+		print "Destination ID: %d Address: %x" % (self.dstV.block.id, self.dstV.block.startEA)
 		print ""
 
 class graph:
