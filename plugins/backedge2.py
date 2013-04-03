@@ -1,4 +1,6 @@
 from idaapi import *
+from idc import *
+from idautils import *
 from graph import *
 
 print "\n--------------------\nbackedge2.py has been started"

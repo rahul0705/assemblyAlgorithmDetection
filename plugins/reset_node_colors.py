@@ -1,3 +1,5 @@
+from idaapi import *
+
 print "\n--------------------\nResetting node colors in current segment"
 
 ea = ScreenEA()

@@ -1,3 +1,9 @@
+from graph import *
+from idaapi import *
+from idautils import *
+from idc import *
+from backedge2 import *
+
 class signature:
 	def __init__(self):
 		self.instr_count = {}
@@ -42,7 +48,29 @@ class signature:
 		i = i + 1
 		words = split(lines[i])
 		self.block_count = int(words[0])
-		
+	
+	def	generate(self, FC, G):
+		for block in FC:
+			G.addVertex(vertex(block))
+			
+			for head in Heads(block.startEA, block.endEA):
+				mnem = GetMnem(head)
+				
+				if mnem not in self.instr_count:
+					self.instr_count[mnem] = 1
+				else:
+					self.instr_count[mnem] = self.instr_count[mnem] + 1
+					
+		G.genereateEdges()
+		DFS(G, G.V[0], 1)
+
+		self.block_count = len(G.V)
+		self.edge_count = len(G.E)
+
+		for e in G.E:
+			if e.status is 2:
+				self.back_edge_count =  self.back_edge_count + 1
+	
 	def printSig(self):
 		print "__Instructions__"
 		
