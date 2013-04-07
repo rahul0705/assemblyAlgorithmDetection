@@ -4,14 +4,15 @@ from signature import *
 
 print "\n--------------------\ncreate_func_sig.py has been started"
 
-sig = signature()
-G = graph()		
-		
 ea = ScreenEA()
 fc = FlowChart(get_func(ea))
 
-sig.generate(fc, G)
+G = graph(fc)	
+sig = signature(fc, G)
 
-sig.printSig()
+#sig = signature(None, None)
+#sig.load()
+#sig.printSig()
+#sig.save()
 		
 print "create_func_sig.py has completed\n--------------------\n"

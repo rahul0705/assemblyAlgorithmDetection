@@ -1,15 +1,33 @@
-from graph import *
 from idaapi import *
 from idautils import *
 from idc import *
-from backedge2 import *
+from string import *
 
 class signature:
-	def __init__(self):
+	def __init__(self, FC, G):
 		self.instr_count = {}
 		self.edge_count = 0
 		self.back_edge_count = 0
 		self.block_count = 0
+		
+		if FC is not None and G is not None:
+			for block in FC:
+				for head in Heads(block.startEA, block.endEA):
+					mnem = GetMnem(head)
+					
+					if mnem not in self.instr_count:
+						self.instr_count[mnem] = 1
+					else:
+						self.instr_count[mnem] = self.instr_count[mnem] + 1
+
+			G.labelEdges(G.V[0], 1)
+
+			self.block_count = len(G.V)
+			self.edge_count = len(G.E)
+
+			for e in G.E:
+				if e.status is 2:
+					self.back_edge_count =  self.back_edge_count + 1
 		
 	def save(self):
 		f = open("sig.txt", "w")
@@ -17,7 +35,7 @@ class signature:
 		for mnem in self.instr_count:
 			f.write(mnem + " " + str(self.instr_count[mnem]) + "\n")
 		
-		f.write("INSTR_COUNT_DONE\n")
+		f.write("\n")
 		
 		f.write("edge_count " + str(self.edge_count) + "\n")
 		f.write("back_edge_count " + str(self.back_edge_count) + "\n")
@@ -32,44 +50,22 @@ class signature:
 		
 		i = 0
 		
-		while lines[i] is not "INSTR_COUNT_DONE":
+		while lines[i] != "\n":
 			words = split(lines[i])
 			self.instr_count[words[0]] = int(words[1])
 			i = i + 1
 			
 		i = i + 1
 		words = split(lines[i])
-		self.edge_count = int(words[0])
+		self.edge_count = int(words[1])
 		
 		i = i + 1
 		words = split(lines[i])
-		self.back_edge_count = int(words[0])
+		self.back_edge_count = int(words[1])
 		
 		i = i + 1
 		words = split(lines[i])
-		self.block_count = int(words[0])
-	
-	def	generate(self, FC, G):
-		for block in FC:
-			G.addVertex(vertex(block))
-			
-			for head in Heads(block.startEA, block.endEA):
-				mnem = GetMnem(head)
-				
-				if mnem not in self.instr_count:
-					self.instr_count[mnem] = 1
-				else:
-					self.instr_count[mnem] = self.instr_count[mnem] + 1
-					
-		G.genereateEdges()
-		DFS(G, G.V[0], 1)
-
-		self.block_count = len(G.V)
-		self.edge_count = len(G.E)
-
-		for e in G.E:
-			if e.status is 2:
-				self.back_edge_count =  self.back_edge_count + 1
+		self.block_count = int(words[1])
 	
 	def printSig(self):
 		print "__Instructions__"

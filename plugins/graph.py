@@ -1,3 +1,7 @@
+from idaapi import *
+from idc import *
+from idautils import *
+
 #status = 0 -> Unexplored
 #status = 1 -> Explored	
 class vertex:
@@ -30,9 +34,14 @@ class edge:
 		print ""
 
 class graph:
-	def __init__(self):
+	def __init__(self, FC):
 		self.V = []
 		self.E = []
+		
+		for block in FC:
+			self.addVertex(vertex(block))
+			
+		self.genereateEdges()
 	
 	def addVertex(self, vertex):
 		self.V.append(vertex)
@@ -52,3 +61,33 @@ class graph:
 		print "_____Edges_____"
 		for e in self.E:
 			e.printEdge()
+			
+	def labelEdges(self, v, level):
+		v.status = 1
+		v.level = level
+		
+		for edge in v.adjList:
+			if edge.status is 0:
+				w = edge.dstV
+				if w.status is 0:
+					edge.status = 1
+					level = level + 1
+					self.labelEdges(w, level)
+					level = level - 1
+				elif w.status is 1 and w.level is not 0 and w.level <= v.level:
+					edge.status = 2
+					
+	def colorBackEdges(self):
+		for e in self.E:
+			if e.status is 2:
+				e.printEdge()
+				
+				if e.srcV.block.id is e.dstV.block.id:
+					for head in Heads(e.srcV.block.startEA, e.srcV.block.endEA):
+						SetColor(head, CIC_ITEM, 0xFF0000)
+				else:
+					for head in Heads(e.srcV.block.startEA, e.srcV.block.endEA):
+						SetColor(head, CIC_ITEM, 0x0000FF)
+						
+					for head in Heads(e.dstV.block.startEA, e.dstV.block.endEA):
+						SetColor(head, CIC_ITEM, 0x00FF00)
