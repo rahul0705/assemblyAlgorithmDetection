@@ -27,7 +27,7 @@ class signature:
 
 			for e in G.E:
 				if e.status is 2:
-					self.back_edge_count =  self.back_edge_count + 1
+					self.back_edge_count = self.back_edge_count + 1
 		
 	def save(self):
 		f = open("sig.txt", "w")
@@ -79,3 +79,15 @@ class signature:
 		
 		print "__Blocks__"
 		print "Block count: %d" % self.block_count
+		
+	def compare(self, sig):
+		combinedVector = {}
+		
+		for item in self.instr_count:
+			combinedVector[item] = -1;
+			
+		for item in sig.instr_count:
+			combinedVector[item] = -1;
+			
+		for item in combinedVector:
+			print "%s: %d" % (item, combinedVector[item]) 

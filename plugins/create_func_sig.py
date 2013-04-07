@@ -9,10 +9,13 @@ fc = FlowChart(get_func(ea))
 
 G = graph(fc)	
 sig = signature(fc, G)
-
-#sig = signature(None, None)
-#sig.load()
-#sig.printSig()
+sig.printSig()
 #sig.save()
+
+sigLoaded = signature(None, None)
+sigLoaded.load()
+
+sigLoaded.compare(sig)
+
 		
 print "create_func_sig.py has completed\n--------------------\n"
