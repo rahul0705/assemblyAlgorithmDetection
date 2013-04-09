@@ -5,41 +5,33 @@ from string import *
 
 class signature:
 	def __init__(self, FC, G):
-		self.instr_count = {}
-		self.edge_count = 0
-		self.back_edge_count = 0
-		self.block_count = 0
+		self.sigVector = {}
 		
 		if FC is not None and G is not None:
 			for block in FC:
 				for head in Heads(block.startEA, block.endEA):
-					mnem = GetMnem(head)
+					item = GetMnem(head)
 					
-					if mnem not in self.instr_count:
-						self.instr_count[mnem] = 1
+					if item not in self.sigVector:
+						self.sigVector[item] = 1
 					else:
-						self.instr_count[mnem] = self.instr_count[mnem] + 1
+						self.sigVector[item] = self.sigVector[item] + 1
 
 			G.labelEdges(G.V[0], 1)
-
-			self.block_count = len(G.V)
-			self.edge_count = len(G.E)
-
+			
+			self.sigVector['block_count'] = len(G.V)
+			self.sigVector['edge_count'] = len(G.E)
+			
+			self.sigVector['back_edge_count'] = 0
 			for e in G.E:
 				if e.status is 2:
-					self.back_edge_count = self.back_edge_count + 1
+					self.sigVector['back_edge_count'] = self.sigVector['back_edge_count'] + 1
 		
 	def save(self):
 		f = open("sig.txt", "w")
 		
-		for mnem in self.instr_count:
-			f.write(mnem + " " + str(self.instr_count[mnem]) + "\n")
-		
-		f.write("\n")
-		
-		f.write("edge_count " + str(self.edge_count) + "\n")
-		f.write("back_edge_count " + str(self.back_edge_count) + "\n")
-		f.write("block_count " + str(self.block_count) + "\n")
+		for item in self.sigVector:
+			f.write(item + " " + str(self.sigVector[item]) + "\n")
 		
 		f.close()
 		
@@ -50,44 +42,47 @@ class signature:
 		
 		i = 0
 		
-		while lines[i] != "\n":
-			words = split(lines[i])
-			self.instr_count[words[0]] = int(words[1])
+		#while lines[i] != "\n":
+		#	words = split(lines[i])
+		#	self.sigVector[words[0]] = int(words[1])
+		#	i = i + 1
+		
+		for line in lines:
+			words = split(line)
+			self.sigVector[words[0]] = int(words[1])
 			i = i + 1
 			
-		i = i + 1
-		words = split(lines[i])
-		self.edge_count = int(words[1])
-		
-		i = i + 1
-		words = split(lines[i])
-		self.back_edge_count = int(words[1])
-		
-		i = i + 1
-		words = split(lines[i])
-		self.block_count = int(words[1])
-	
 	def printSig(self):
-		print "__Instructions__"
-		
-		for mnem in self.instr_count:
-			print "%s: %d" % (mnem, self.instr_count[mnem])
-			
-		print "__Edges__"
-		print "Edge Count: %d" % self.edge_count
-		print "Backedge Count: %d" % self.back_edge_count
-		
-		print "__Blocks__"
-		print "Block count: %d" % self.block_count
+		for item in self.sigVector:
+			print "%s: %d" % (item, self.sigVector[item])
+
 		
 	def compare(self, sig):
-		combinedVector = {}
+		selfCombinedVector = {}
+		otherCombinedVector = {}
 		
-		for item in self.instr_count:
-			combinedVector[item] = -1;
+		for item in self.sigVector:
+			selfCombinedVector[item] = self.sigVector[item]
+			otherCombinedVector[item] = 0
+				
+		for item in sig.sigVector:
+			if item not in selfCombinedVector:
+				selfCombinedVector[item] = 0
+			otherCombinedVector[item] = sig.sigVector[item]
 			
-		for item in sig.instr_count:
-			combinedVector[item] = -1;
+		for item in selfCombinedVector:
+			print "%s: %d" % (item, selfCombinedVector[item])
+		
+		print "\n"
 			
-		for item in combinedVector:
-			print "%s: %d" % (item, combinedVector[item]) 
+		for item in otherCombinedVector:
+			print "%s: %d" % (item, otherCombinedVector[item])
+		
+		#for item in self.instr_count:
+		#	combinedVector[item] = -1;
+			
+		#for item in sig.instr_count:
+		#	combinedVector[item] = -1;
+			
+		#for item in combinedVector:
+		#	print "%s: %d" % (item, combinedVector[item]) 
