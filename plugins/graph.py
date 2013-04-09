@@ -3,19 +3,28 @@ from idc import *
 from idautils import *
 
 #status = 0 -> Unexplored
-#status = 1 -> Explored	
+#status = 1 -> Explored
+
+#label = 0 -> Normal
+#label = 1 -> Source of back edge
+#label = 2 -> Dest of back edge	
 class vertex:
 	def __init__(self, block):
 		self.block = block
 		self.status = 0
 		self.level = 0
+		self.label = 0
 		self.adjList = []
+		self.backAdjList = []
 			
 	def printVertex(self):
 		print "Vertex ID: %d Start: %x End: %x" % (self.block.id, self.block.startEA, self.block.endEA)
 		
 		for edge in self.adjList:
 			print "\tSuccessor ID: %d Start: %x End: %x" % (edge.dstV.block.id, edge.dstV.block.startEA, edge.dstV.block.endEA)
+			
+		for edge in self.backAdjList:
+			print "\tPredecessor ID: %d Start: %x End: %x" % (edge.dstV.block.id, edge.dstV.block.startEA, edge.dstV.block.endEA)
 			
 		print ""
 
@@ -37,6 +46,7 @@ class graph:
 	def __init__(self, FC):
 		self.V = []
 		self.E = []
+		self.RE = []
 		
 		for block in FC:
 			self.addVertex(vertex(block))
@@ -52,6 +62,9 @@ class graph:
 				e = edge(v, self.V[b.id])
 				self.E.append(e)
 				v.adjList.append(e)
+				e = edge(self.V[b.id], v)
+				self.RE.append(e)
+				v.backAdjList.append(e)
 	
 	def printGraph(self):
 		print "_____Verticies_____"
@@ -60,6 +73,10 @@ class graph:
 		
 		print "_____Edges_____"
 		for e in self.E:
+			e.printEdge()
+			
+		print "_____Reverse Edges_____"
+		for e in self.RE:
 			e.printEdge()
 			
 	def labelEdges(self, v, level):
@@ -76,6 +93,8 @@ class graph:
 					level = level - 1
 				elif w.status is 1 and w.level is not 0 and w.level <= v.level:
 					edge.status = 2
+					edge.srcV.label = 1
+					edge.dstV.label = 2
 					
 	def colorBackEdges(self):
 		for e in self.E:
