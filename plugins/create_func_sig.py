@@ -15,7 +15,8 @@ sig.printSig()
 sigLoaded = signature(None, None)
 sigLoaded.load()
 
-sigLoaded.compare(sig)
+similarity = sigLoaded.compare(sig)
 
+print similarity
 		
 print "create_func_sig.py has completed\n--------------------\n"
