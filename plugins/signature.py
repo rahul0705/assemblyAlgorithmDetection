@@ -30,7 +30,7 @@ class signature:
 					self.sigVector['back_edge_count'] = self.sigVector['back_edge_count'] + 1
 		
 	def save(self):
-		f = open("sig.txt", "w")
+		f = open("../sig.txt", "w")
 		
 		for item in self.sigVector:
 			f.write(item + " " + str(self.sigVector[item]) + "\n")
@@ -38,7 +38,7 @@ class signature:
 		f.close()
 		
 	def load(self):
-		f = open("sig.txt", "r")
+		f = open("../sig.txt", "r")
 		lines = f.readlines()
 		f.close()
 		
