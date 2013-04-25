@@ -13,8 +13,9 @@ sig = signature(fc, G)
 sigLoaded = signature(None, None)
 sigLoaded.load()
 
+#sigLoaded.printSig()
 similarity = sigLoaded.compare(sig)
 
-print similarity
+print "\nSimilarity: %f\n" % (similarity)
 		
 print "compare_func_sig.py has completed\n--------------------\n"

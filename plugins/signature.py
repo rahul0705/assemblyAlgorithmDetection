@@ -5,6 +5,10 @@ from string import *
 from math import *
 from sys import *
 
+DIR = "C:\\Users\\gbrinzea\\Desktop\\CS490PRE\\repo\\trunk\\plugins"
+
+
+
 class signature:
 	def __init__(self, FC, G):
 		self.sigVector = {}
@@ -12,8 +16,15 @@ class signature:
 		self.compiler = ""
 		self.optimization = ""
 		
-		
 		if FC is not None and G is not None:
+			filename = get_root_filename()
+		
+			file_components = split(filename, '-')
+			
+			self.algorithm = file_components[0]
+			self.compiler = (split(file_components[2], '.'))[0]
+			self.optimization = file_components[1]
+			
 			for block in FC:
 				for head in Heads(block.startEA, block.endEA):
 					item = GetMnem(head)
@@ -37,7 +48,13 @@ class signature:
 					self.sigVector['back_edge_count'] = self.sigVector['back_edge_count'] + 1
 			
 	def save(self):
-		f = open("../sig.txt", "w")
+		os.chdir(DIR)
+		
+		f = open("signatures/" + self.algorithm + "-" + self.optimization + "-" + self.compiler + ".txt", "w")
+		
+		f.write("Algorithm " + self.algorithm + "\n")
+		f.write("Compiler " + self.compiler + "\n")
+		f.write("Optimization " + self.optimization + "\n\n")
 		
 		for item in self.sigVector:
 			f.write(item + " " + str(self.sigVector[item]) + "\n")
@@ -45,28 +62,39 @@ class signature:
 		f.close()
 		
 	def load(self):
+		os.chdir(DIR)
+	
 		f = open("../sig.txt", "r")
 		lines = f.readlines()
 		f.close()
 		
 		i = 0
 		
-		#while lines[i] != "\n":
-		#	words = split(lines[i])
-		#	self.sigVector[words[0]] = int(words[1])
-		#	i = i + 1
-		
 		for line in lines:
 			words = split(line)
-			self.sigVector[words[0]] = float(words[1])
-			i = i + 1
+			
+			if i is 0:
+				self.algorithm = words[1]
+			elif i is 1:
+				self.compiler = words[1]
+			elif i is 2:
+				self.optimization = words[1]
+			elif i > 3:
+				self.sigVector[words[0]] = float(words[1])
+			
+			i = i + 1			
 			
 	def printSig(self):
+		print "Algorithm: %s" % (self.algorithm)
+		print "Compiler: %s" % (self.compiler)
+		print "Optimization: %s\n" % (self.optimization)
+		
+		print "_____Signature Vector_____"
 		for item in self.sigVector:
 			print "%s: %f" % (item, self.sigVector[item])
 
 		
-	def compare(self, sig):
+	def compare(self, other):
 		selfCombinedVector = {}
 		otherCombinedVector = {}
 		
@@ -74,19 +102,19 @@ class signature:
 			selfCombinedVector[item] = self.sigVector[item]
 			otherCombinedVector[item] = 0
 				
-		for item in sig.sigVector:
+		for item in other.sigVector:
 			if item not in selfCombinedVector:
 				selfCombinedVector[item] = 0
-			otherCombinedVector[item] = sig.sigVector[item]
+			otherCombinedVector[item] = other.sigVector[item]
 			
 		scale = 1
 		
 		dotProduct = 0
 		for item in selfCombinedVector:
-			print "%s: Self: %f, Other: %f" % (item, selfCombinedVector[item], otherCombinedVector[item])
+			print "%s:\nLoaded: %f, Current: %f" % (item, selfCombinedVector[item], otherCombinedVector[item])
 			dotProduct = dotProduct + float(selfCombinedVector[item]) * float(otherCombinedVector[item])
 			
-		print "Dot Product: %f" % dotProduct
+		print "\nDot Product: %f" % dotProduct
 		
 		mag1 = 0
 		mag2 = 0
@@ -98,7 +126,7 @@ class signature:
 		mag1 = sqrt(mag1)
 		mag2 = sqrt(mag2)
 		
-		print "mag1: %f, mag2: %f" % (mag1, mag2)
+		print "Loaded magnitude: %f, Current magnitude: %f" % (mag1, mag2)
 		
 		similarity = dotProduct / (mag1 * mag2)
 		
