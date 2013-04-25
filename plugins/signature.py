@@ -3,10 +3,15 @@ from idautils import *
 from idc import *
 from string import *
 from math import *
+from sys import *
 
 class signature:
 	def __init__(self, FC, G):
 		self.sigVector = {}
+		self.algorithm = ""
+		self.compiler = ""
+		self.optimization = ""
+		
 		
 		if FC is not None and G is not None:
 			for block in FC:
@@ -24,11 +29,13 @@ class signature:
 			#self.sigVector['block_count'] = len(G.V)
 			#self.sigVector['edge_count'] = len(G.E)
 			
+			self.sigVector['block_to_edge_ratio'] = float(len(G.V)) / len(G.E)
+			
 			self.sigVector['back_edge_count'] = 0
 			for e in G.E:
 				if e.status is 2:
 					self.sigVector['back_edge_count'] = self.sigVector['back_edge_count'] + 1
-		
+			
 	def save(self):
 		f = open("../sig.txt", "w")
 		
@@ -51,12 +58,12 @@ class signature:
 		
 		for line in lines:
 			words = split(line)
-			self.sigVector[words[0]] = int(words[1])
+			self.sigVector[words[0]] = float(words[1])
 			i = i + 1
 			
 	def printSig(self):
 		for item in self.sigVector:
-			print "%s: %d" % (item, self.sigVector[item])
+			print "%s: %f" % (item, self.sigVector[item])
 
 		
 	def compare(self, sig):
@@ -76,16 +83,8 @@ class signature:
 		
 		dotProduct = 0
 		for item in selfCombinedVector:
-			print "%s: Self: %d, Other: %d" % (item, selfCombinedVector[item], otherCombinedVector[item])
-			
-			if item == 'back_edge_count':
-				dotProduct = dotProduct + scale * int(selfCombinedVector[item]) * scale * int(otherCombinedVector[item])
-			elif item == 'edge_count':
-				dotProduct = dotProduct + scale * int(selfCombinedVector[item]) * scale * int(otherCombinedVector[item])
-			elif item == 'block_count':
-				dotProduct = dotProduct + scale * int(selfCombinedVector[item]) * scale * int(otherCombinedVector[item])
-			else:
-				dotProduct = dotProduct + int(selfCombinedVector[item]) * int(otherCombinedVector[item])
+			print "%s: Self: %f, Other: %f" % (item, selfCombinedVector[item], otherCombinedVector[item])
+			dotProduct = dotProduct + float(selfCombinedVector[item]) * float(otherCombinedVector[item])
 			
 		print "Dot Product: %f" % dotProduct
 		
@@ -93,18 +92,8 @@ class signature:
 		mag2 = 0
 		
 		for item in selfCombinedVector:
-			if item == 'back_edge_count':
-				mag1 = mag1 + scale * int(selfCombinedVector[item]) * scale * int(selfCombinedVector[item])
-				mag2 = mag2 + scale * int(otherCombinedVector[item]) * scale * int(otherCombinedVector[item])
-			elif item == 'edge_count':
-				mag1 = mag1 + scale * int(selfCombinedVector[item]) * scale * int(selfCombinedVector[item])
-				mag2 = mag2 + scale * int(otherCombinedVector[item]) * scale * int(otherCombinedVector[item])
-			elif item == 'block_count':
-				mag1 = mag1 + scale * int(selfCombinedVector[item]) * scale * int(selfCombinedVector[item])
-				mag2 = mag2 + scale * int(otherCombinedVector[item]) * scale * int(otherCombinedVector[item])
-			else:
-				mag1 = mag1 + int(selfCombinedVector[item]) * int(selfCombinedVector[item])
-				mag2 = mag2 + int(otherCombinedVector[item]) * int(otherCombinedVector[item])
+			mag1 = mag1 + float(selfCombinedVector[item]) * float(selfCombinedVector[item])
+			mag2 = mag2 + float(otherCombinedVector[item]) * float(otherCombinedVector[item])
 		
 		mag1 = sqrt(mag1)
 		mag2 = sqrt(mag2)
