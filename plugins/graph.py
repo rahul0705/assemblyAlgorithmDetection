@@ -68,7 +68,7 @@ class graph:
 				v.adjList.append(e)
 				e = edge(self.V[b.id], v)
 				self.RE.append(e)
-				v.backAdjList.append(e)
+				self.V[b.id].backAdjList.append(e)
 	
 	def printGraph(self):
 		print "_____Verticies_____"
