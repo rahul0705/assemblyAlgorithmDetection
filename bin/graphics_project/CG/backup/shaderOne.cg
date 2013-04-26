@@ -1,0 +1,340 @@
+
+struct VertexDataInput {
+	float4 vertex : POSITION;
+	float3 normal : NORMAL;
+	float3 color : COLOR;
+	float2 texCoord : TEXCOORD0;
+};
+
+struct VertexDataOutput {
+	float4 projv  : POSITION;
+	float4 color : COLOR;
+	float3 vertex : TEXCOORD0;
+	float3 normal : TEXCOORD1;
+};
+
+struct PixelDataOutput {
+	float4 color : COLOR0;
+};
+
+bool containedInPlane(float3 P, float t, float3 quadV0, float3 quadV1, float3 quadV2, float3 quadV3, float3 quadN);
+void intersectFrustum(float3 DIFP[8], float3 V, float3 P0, out float3 nearIntP, out float3 farIntP);
+void projectDepthImage(float3 depthImageCameraEye, float4x4 depthImageModelViewProj, float3 nearP, float3 farP, out float3 nearPproj, out float3 farPproj);
+void intersectDepths(float3 nP, float3 fP, sampler2D depthImageZ, sampler2D depthImageRGB, out float4 ret);
+float cross2(float2 a, float2 b);
+
+VertexDataOutput VertexMain(VertexDataInput vdi, uniform float4x4 modelViewProj) {
+	VertexDataOutput ret;
+	ret.projv = mul(modelViewProj, vdi.vertex);
+	ret.color = float4(vdi.color, 1.0f);
+	ret.vertex = vdi.vertex;
+	ret.normal = vdi.normal;
+	return ret;
+}
+
+TRIANGLE void GeometryMain(AttribArray<VertexDataOutput> tverts, uniform float4x4 modelViewProj){
+	emitVertex(tverts[0]);
+	emitVertex(tverts[1]);
+	emitVertex(tverts[2]);
+
+	return;
+}
+
+PixelDataOutput FragmentMain(VertexDataOutput pdi, 
+	uniform float3 cameraEye, 
+	uniform samplerCUBE envMap,
+	uniform float3 quadV0, 
+	uniform float3 quadV1, 
+	uniform float3 quadV2, 
+	uniform float3 quadV3,
+	uniform sampler2D quadTex,
+	uniform float quadTexCoordsMultiplier, 
+	uniform sampler2D depthImageZ,
+	uniform sampler2D depthImageRGB,
+	uniform float3 depthImageFrustumPoints[8],
+	uniform float3 depthImageCameraEye,
+	uniform float4x4 depthImageModelViewProj) {
+
+	PixelDataOutput ret;
+
+	ret.color = float4(-1.0f, -1.0f, -1.0f, 1.0f);
+
+	float3 P0 = pdi.vertex; //model space vertex
+	float3 N0 = normalize(pdi.normal); //normal at vertex
+	float3 L = normalize(P0 - cameraEye); //vector to camera eye from vertex
+	float3 V = normalize(L - 2*dot(L,N0)*N0); //reflected camera eye vector at vertex
+
+	//Depth Image
+	float3 n, f;
+
+	intersectFrustum(depthImageFrustumPoints, V, P0, n, f);
+	if(n.x != -1000000.0f){
+		float3 nP, fP;
+		projectDepthImage(depthImageCameraEye, depthImageModelViewProj, n, f, nP, fP);
+		//ret.color = float4(nP.z, 0.0f, 0.0f, 1.0f);
+		//ret.color = float4(0.0f, fP.y, 0.0f, 1.0f);
+		if(fP.x <= 1.0f && fP.x >= 0.0f && fP.y <= 1.0f && fP.y >= 0.0f){
+			//ret.color = tex2D(depthImageRGB, fP.xy);
+			//ret.color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+		}
+		intersectDepths(nP, fP, depthImageZ, depthImageRGB, ret.color);
+	}
+
+	if(ret.color.x == -1.0f){ //Quad
+		float3 quadN = normalize(cross(quadV2 - quadV1, quadV0 - quadV1)); //quad normal
+		float t = dot(quadN, quadV1 - P0)/dot(quadN,V); //parameter to scale V to intersect quad, could be negative
+		float3 P = P0 + t*V; //point of intersection with V and quad
+		
+		//if(t > 0 && P.x >= quadV1.x && P.x <= quadV2.x && P.z >= quadV3.z && P.z <= quadV2.z){ //hard code for rectanglular plane parallel to xz plane
+
+		if(containedInPlane(P, t, quadV0, quadV1, quadV2, quadV3, quadN)){ //Intersection with arbitrary plane
+			float2 quadTexCoords = float2((P.x - quadV1.x)/(quadV2.x-quadV1.x), (P.z - quadV3.z)/(quadV2.z-quadV3.z)) * quadTexCoordsMultiplier;
+
+			ret.color = tex2D(quadTex, quadTexCoords);
+		}
+	}
+
+	if(ret.color.x == -1.0f){ //Environment Map
+		ret.color = texCUBE(envMap, V);
+	}
+	
+	float4 diffuseColor = float4(238.0f/255.0f, 232.0f/255.0f, 170.0f/255.0f, 1.0f);
+	float scaleFactor = 0.0f;
+
+	ret.color = (1-scaleFactor) * ret.color + scaleFactor * diffuseColor;
+	
+	return ret;
+}
+
+bool containedInPlane(float3 P, float t, float3 quadV0, float3 quadV1, float3 quadV2, float3 quadV3, float3 quadN){
+	float3 cross0 = cross(quadV1 - quadV0, P - quadV0);
+	float3 cross1 = cross(quadV2 - quadV1, P - quadV1);
+	float3 cross2 = cross(quadV3 - quadV2, P - quadV2);
+	float3 cross3 = cross(quadV0 - quadV3, P - quadV3);
+	float dot0 = dot(cross0, quadN);
+	float dot1 = dot(cross1, quadN);
+	float dot2 = dot(cross2, quadN);
+	float dot3 = dot(cross3, quadN);
+
+	bool result = false;
+
+	if(t > 0 && ((dot0 < 0 && dot1 < 0 && dot2 < 0 && dot3 < 0) || (dot0 > 0 && dot1 > 0 && dot2 > 0 && dot3 > 0))){
+		result = true;
+	}
+
+	return result;
+}
+
+void intersectFrustum(float3 DIFP[8], float3 V, float3 P0, out float3 nearIntP, out float3 farIntP){
+	//float4 result = float4(-1.0f, -1.0f, -1.0f, 1.0f);
+	float tVal1 = -100000.0f;
+	float tVal2 = -100000.0f;
+	bool tVal1Set = false;
+	bool tVal2Set = false;
+
+	//front 0, 1, 2, 3
+	//back 7, 6, 5, 4
+	//left 4, 5, 1, 0
+	//right 3, 2, 6, 7
+	//top 4, 0, 3, 7
+	//bottom 6, 2, 1, 5
+	int DIFPmap[6][4] = {{0, 1, 2, 3}, 
+							{7, 6, 5, 4}, 
+							{4, 5, 1, 0}, 
+							{3, 2, 6, 7}, 
+							{4, 0, 3, 7}, 
+							{6, 2, 1, 5}};
+
+	float3 quadN;
+	float t;
+	float3 P;
+	float closestT = 1000000.0f;
+	int count = 0;
+
+	for(int i = 0; i < 6; i++){
+		quadN = normalize(cross(DIFP[DIFPmap[i][2]] - DIFP[DIFPmap[i][1]], DIFP[DIFPmap[i][0]] - DIFP[DIFPmap[i][1]])); //quad normal
+		t = dot(quadN, DIFP[DIFPmap[i][1]] - P0)/dot(quadN,V); //parameter to scale V to intersect quad, could be negative
+		P = P0 + t*V; //point of intersection with V and quad
+		
+		if(containedInPlane(P, t, DIFP[DIFPmap[i][0]], DIFP[DIFPmap[i][1]], DIFP[DIFPmap[i][2]], DIFP[DIFPmap[i][3]], quadN)){
+			/*if(t > closestT){
+				continue;
+			}
+			
+			closestT = t;*/
+
+			if(!tVal1Set){
+				tVal1 = t;
+				tVal1Set = true;
+			}else if(!tVal2Set){
+				tVal2 = t;
+				tVal2Set = true;
+			}
+
+			count = count + 1;
+			
+			/*if(i == 0){
+				nearIntP = float4(1.0f, 0.0f, 0.0f, 1.0f);
+			}else if(i == 1){
+				nearIntP = float4(0.0f, 1.0f, 0.0f, 1.0f);
+			}else if(i == 2){
+				nearIntP = float4(0.0f, 0.0f, 1.0f, 1.0f);
+			}else if(i == 3){
+				nearIntP = float4(1.0f, 1.0f, 0.0f, 1.0f);
+			}else if(i == 4){
+				nearIntP = float4(1.0f, 0.0f, 1.0f, 1.0f);
+			}else if(i == 5){
+				nearIntP = float4(0.0f, 1.0f, 1.0f, 1.0f);
+			}*/
+		}
+	}
+
+	if(!tVal1Set || count > 2){
+		nearIntP = float3(-1000000.0f, -1000000.0f, -1000000.0f);
+		farIntP = float3(-1000000.0f, -1000000.0f, -1000000.0f);
+	}else if(!tVal2Set){
+		nearIntP = P0;
+		farIntP = P0 + tVal1*V;
+	}else if(tVal1Set && tVal2Set){
+		if(tVal1 < tVal2){
+			nearIntP = P0 + tVal1*V;
+			farIntP = P0 + tVal2*V;
+		}else{
+			nearIntP = P0 + tVal2*V;
+			farIntP = P0 + tVal1*V;
+		}
+	}
+}
+
+
+void projectDepthImage(float3 depthImageCameraEye, float4x4 depthImageModelViewProj, float3 nearP, float3 farP, out float3 nearPproj, out float3 farPproj){
+	float4 n = mul(depthImageModelViewProj, float4(nearP, 1.0f));
+	float4 f = mul(depthImageModelViewProj, float4(farP, 1.0f));
+
+	nearPproj = ((n.xyz / n.w) + float3(1.0f, 1.0f, 1.0f))/2.0f;
+	farPproj = ((f.xyz / f.w) + float3(1.0f, 1.0f, 1.0f))/2.0f;
+
+	nearPproj = clamp(nearPproj, float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f));
+	farPproj = clamp(farPproj, float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f));
+
+	/*//NEAR CLAMP
+	if(nearPproj.x < 0.0f && nearPproj.x > -0.001){
+		nearPproj.x = 0.0f;
+	}else if(nearPproj.x > 1.0f && nearPproj.x < 1.001){
+		nearPproj.x = 1.0f;
+	}
+
+	if(nearPproj.y < 0.0f && nearPproj.y > -0.001){
+		nearPproj.y = 0.0f;
+	}else if(nearPproj.y > 1.0f && nearPproj.y < 1.001){
+		nearPproj.y = 1.0f;
+	}
+
+	//FAR CLAMP
+	if(farPproj.x < 0.0f && farPproj.x > -0.001){
+		farPproj.x = 0.0f;
+	}else if(farPproj.x > 1.0f && farPproj.x < 1.001){
+		farPproj.x = 1.0f;
+	}
+
+	if(farPproj.y < 0.0f && farPproj.y > -0.001){
+		farPproj.y = 0.0f;
+	}else if(farPproj.y > 1.0f && farPproj.y < 1.001){
+		farPproj.y = 1.0f;
+	}*/
+}
+
+void intersectDepths(float3 nP, float3 fP, sampler2D depthImageZ, sampler2D depthImageRGB, out float4 ret){
+	float stepsN = max(ceil(abs((nP.x - fP.x)*640)), ceil(abs((nP.y - fP.y)*480)));
+	//float stepsN = 100.0f;
+	float2 s0 = nP.xy; 
+	float z0 = nP.z;
+	s0 = clamp(s0, float2(0.0f, 0.0f), float2(1.0f, 1.0f));
+	z0 = clamp(z0, float(0.0f), float(1.0f));
+	float2 s1;
+	float z1;
+
+	float dx;
+	float dy;
+	float det;
+	float u;
+	float v;
+	float2 as;
+	float2 bs;
+	float2 ad;
+	float2 bd;
+
+	bool colorFound = false;
+
+	for(float i = 0.0f; i < stepsN; i++){
+		s1 = nP.xy + (fP.xy - nP.xy) * (i+1.0f)/stepsN;
+		z1 = nP.z + (fP.z - nP.z) * (i+1.0f)/stepsN;
+
+		//s1 = clamp(s1, float2(0.0f, 0.0f), float2(1.0f, 1.0f));
+		//z1 = clamp(z1, float(0.0f), float(1.0f));
+
+		/*if(s1.x <= 1.0f && s1.x >= 0.0f && s1.y <= 1.0f && s1.y >= 0.0f){
+			continue;
+		}*/
+
+		as = float2(0.0f, z0);
+		bs = float2(0.0f, tex2D(depthImageZ, s0).x);
+
+		ad = normalize((float2(1.0f, z1) - as));
+		bd = normalize((float2(1.0f, tex2D(depthImageZ, s1).x) - bs));
+
+		det = bd.x*ad.y - bd.y*ad.x;
+
+		if(abs(det) < 0.000001f){
+			s0 = s1;
+			z0 = z1;
+			continue;
+		}
+
+		dx = bs.x - as.x;
+		dy = bs.y - as.y;
+
+		u = (dy*bd.x - dx*bd.y) / det;
+		v = (dy*ad.x - dx*ad.y) / det;
+
+		float k = (as + u*ad).x;
+
+		if(k >= 0.0f && k <= 1.0f){
+			if(!colorFound){
+				float2 texCoord = s0 + (s1 - s0) * k;
+				texCoord = clamp(texCoord, float2(0.0f, 0.0f), float2(1.0f, 1.0f));
+				ret = tex2D(depthImageRGB, texCoord);
+				//ret = float4(1.0f, 0.0f, 0.0f, 1.0f);
+				colorFound = true;
+				i = stepsN;
+			}
+		}else{
+			if(!colorFound){
+				//ret = tex2D(depthImageRGB, s0 + (s1 - s0) * k);
+				//ret = float4(0.0f, 0.0f, 1.0f, 1.0f);
+				//colorFound = true;
+			}
+		}
+
+		/*if(u >= 0.0f && v >= 0.0){
+			if(length(v*ad) <= length((float2(1.0f, z1) - as)) && 
+				length(u*bd) <= length((float2(1.0f, tex2D(depthImageZ, s1).x) - bs))){
+				if(!colorFound){
+					ret = tex2D(depthImageRGB, s0 + (s1 - s0) * (as + v*ad).x);
+					colorFound = true;
+				}
+			}
+		}*/
+
+		s0 = s1;
+		z0 = z1;
+	}
+
+	if(!colorFound){
+		ret = float4(-1.0f, -1.0f, -1.0f, 1.0f);
+	}
+}
+
+float cross2(float2 a, float2 b){
+	return a.x*b.y - a.y*b.x;
+}
