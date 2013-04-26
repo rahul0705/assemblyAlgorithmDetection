@@ -7,8 +7,6 @@ from sys import *
 
 DIR = "C:\\Users\\gbrinzea\\Desktop\\CS490PRE\\repo\\trunk\\plugins"
 
-
-
 class signature:
 	def __init__(self, FC, G):
 		self.sigVector = {}
@@ -61,10 +59,10 @@ class signature:
 		
 		f.close()
 		
-	def load(self):
+	def load(self, filename):
 		os.chdir(DIR)
 	
-		f = open("../sig.txt", "r")
+		f = open("signatures/" + filename, "r")
 		lines = f.readlines()
 		f.close()
 		
@@ -94,7 +92,7 @@ class signature:
 			print "%s: %f" % (item, self.sigVector[item])
 
 		
-	def compare(self, other):
+	def compareLoaded(self, other):
 		selfCombinedVector = {}
 		otherCombinedVector = {}
 		
@@ -111,10 +109,10 @@ class signature:
 		
 		dotProduct = 0
 		for item in selfCombinedVector:
-			print "%s:\nLoaded: %f, Current: %f" % (item, selfCombinedVector[item], otherCombinedVector[item])
+			#print "%s:\nLoaded: %f, Current: %f" % (item, selfCombinedVector[item], otherCombinedVector[item])
 			dotProduct = dotProduct + float(selfCombinedVector[item]) * float(otherCombinedVector[item])
 			
-		print "\nDot Product: %f" % dotProduct
+		#print "\nDot Product: %f" % dotProduct
 		
 		mag1 = 0
 		mag2 = 0
@@ -126,8 +124,19 @@ class signature:
 		mag1 = sqrt(mag1)
 		mag2 = sqrt(mag2)
 		
-		print "Loaded magnitude: %f, Current magnitude: %f" % (mag1, mag2)
+		#print "Loaded magnitude: %f, Current magnitude: %f" % (mag1, mag2)
 		
 		similarity = dotProduct / (mag1 * mag2)
 		
 		return similarity
+		
+	def compare(self):
+		similarities = []
+		
+		for file in os.listdir("signatures"):
+			if file[0] != '.':
+				sigLoaded = signature(None, None)
+				sigLoaded.load(file)
+				similarities.append([sigLoaded.algorithm, sigLoaded.compiler, sigLoaded.optimization, sigLoaded.compareLoaded(self)])
+		
+		return similarities
