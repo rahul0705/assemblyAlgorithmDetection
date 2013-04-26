@@ -39,13 +39,13 @@ class block:
 			else:
 				verOps[op] += 1
 		for key in verOps.keys():
-			self.prime *= int(pow(ops[key],  verOps[key]))
+			self.prime *= (ops[key] ** verOps[key])
 	
 	def getPrime(self):
 		return self.prime
 
 class function_block:
-	def __init__(self, FC, G):
+	def __init__(self, FC, G, flag = True):
 		self.ops = load(open("../ops.txt"))
 		
 		currentPrime = 2;
@@ -60,13 +60,12 @@ class function_block:
 		self.prime = 1
 		
 		if FC is not None and G is not None:
-			filename = get_root_filename()
-		
-			file_components = split(filename, '-')
-			
-			self.algorithm = file_components[0]
-			self.compiler = (split(file_components[2], '.'))[0]
-			self.optimization = file_components[1]
+			if flag:
+				filename = get_root_filename()
+				file_components = split(filename, '-')
+				self.algorithm = file_components[0]
+				self.compiler = (split(file_components[2], '.'))[0]
+				self.optimization = file_components[1]
 			for node in FC:
 				blk = block(node, self.ops, currentPrime)
 				self.blocks[node.id] = blk.getPrime()
@@ -97,9 +96,9 @@ class function_block:
 		for key in spp.keys():
 			diff = 0.0
 			if spp[key][0] < self.prime:
-				diff = float(spp[key][0])/self.prime
+				diff = Decimal(spp[key][0])/Decimal(self.prime)
 			elif spp[key][0] > self.prime:
-				diff = self.prime/float(spp[key][0])
+				diff = Decimal(self.prime)/Decimal(spp[key][0])
 			else:
 				diff = 1
 			if diff >= threshold:

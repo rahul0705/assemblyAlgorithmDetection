@@ -5,7 +5,7 @@ from string import *
 from graph import *
 from function import *
 
-threshold = .0001
+threshold = 1
 
 print "\n--------------------\nSPP.py has been started"
 
@@ -15,7 +15,7 @@ ea = ScreenEA()
 for function_ea in Functions(SegStart(ea), SegEnd(ea)):
 	fc = FlowChart(get_func(function_ea))
 	G = graph(fc)
-	func = function_block(fc, G)
+	func = function_block(fc, G, False)
 	similarities = func.compare(threshold)
 	
 	for key in similarities.keys():
