@@ -1,26 +1,34 @@
 {
-  "bubble_sort_maximum_speed_vs.exe": 95481751760042568465436086344693205007781982421875, 
-  "bubble_sort_maximum_speed_vs.exe 4198400": 273819, 
-  "bubble_sort_maximum_speed_vs.exe 4198421": 1964315, 
-  "bubble_sort_maximum_speed_vs.exe 4198432": 139995, 
-  "bubble_sort_maximum_speed_vs.exe 4198448": 25, 
-  "bubble_sort_maximum_speed_vs.exe 4198455": 26825, 
-  "bubble_sort_maximum_speed_vs.exe 4198465": 25, 
-  "bubble_sort_maximum_speed_vs.exe 4198471": 26825, 
-  "bubble_sort_maximum_speed_vs.exe 4198480": 25, 
-  "bubble_sort_maximum_speed_vs.exe 4198485": 26825, 
-  "bubble_sort_maximum_speed_vs.exe 4198494": 25, 
-  "bubble_sort_maximum_speed_vs.exe 4198499": 104017, 
-  "bubble_sort_maximum_speed_vs.exe 4198505": 1763, 
-  "bubble_sort_maximum_speed_vs.exe 4198508": 917059, 
-  "bubble_sort_minimum_size_vs.exe": 37852707123530466654934122057400690546875, 
-  "bubble_sort_minimum_size_vs.exe 4198400": 2297295, 
-  "bubble_sort_minimum_size_vs.exe 4198423": 1964315, 
-  "bubble_sort_minimum_size_vs.exe 4198434": 135, 
-  "bubble_sort_minimum_size_vs.exe 4198444": 247, 
-  "bubble_sort_minimum_size_vs.exe 4198447": 7752425, 
-  "bubble_sort_minimum_size_vs.exe 4198462": 25, 
-  "bubble_sort_minimum_size_vs.exe 4198466": 17081, 
-  "bubble_sort_minimum_size_vs.exe 4198472": 1763, 
-  "bubble_sort_minimum_size_vs.exe 4198477": 43101773
+  "bubble_sort visual_studio maximum_speed": [
+    17310379308506419519613392054544272223280914770219085283885, 
+    {
+      "0": 15015, 
+      "1": 6678671, 
+      "10": 14147, 
+      "11": 2021, 
+      "12": 96621173, 
+      "2": 220779, 
+      "3": 289, 
+      "4": 343621, 
+      "5": 289, 
+      "6": 343621, 
+      "7": 289, 
+      "8": 343621, 
+      "9": 289
+    }
+  ], 
+  "bubble_sort visual_studio minimum_size": [
+    38053062133410119472028172601437273407235653065, 
+    {
+      "0": 17393805, 
+      "1": 6678671, 
+      "2": 459, 
+      "3": 209, 
+      "4": 58071949, 
+      "5": 289, 
+      "6": 17081, 
+      "7": 2021, 
+      "8": 5893891553
+    }
+  ]
 }

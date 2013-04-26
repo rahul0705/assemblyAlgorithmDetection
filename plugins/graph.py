@@ -16,10 +16,6 @@ class vertex:
 		self.label = 0
 		self.adjList = []
 		self.backAdjList = []
-	
-	def getNextOp(self):
-		for head in Heads(self.block.startEA, self.block.endEA):
-			return GetMnem(head)
 
 	def printVertex(self):
 		print "Vertex ID: %d Start: %x End: %x" % (self.block.id, self.block.startEA, self.block.endEA)

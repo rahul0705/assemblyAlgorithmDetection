@@ -9,7 +9,7 @@ def nextPrime(currentPrime):
 	nextPrime = currentPrime + 1
 	if nextPrime%2 == 0:
 		nextPrime += 1
-	while isPrime(nextPrime) is not True:
+	while not isPrime(nextPrime):
 		nextPrime += 2
 	return nextPrime
 
@@ -24,9 +24,13 @@ def isPrime(num):
 	return ret
 
 print "\n--------------------\nSPP.py has been started"
-	
+
+#load operator dictionary	
 ops = json.load(open("../ops.txt"))
+#load comparison dictionary
 spp = json.load(open("../spp.txt"))
+
+#find the largest prime in the ops
 currentPrime = 2;
 for key in ops.keys():
 	if ops[key] > currentPrime:
@@ -53,7 +57,7 @@ for v in G.V:
 	for key in verOps.keys():
 		prime *= int(math.pow(ops[key],  verOps[key]))
 	graphPrime *= prime
-	name = get_root_filename() + " " + str(v.block.startEA)
+	name = get_root_filename() + " " + str(hex(v.block.startEA))
 	first = True
 	for key in spp.keys():
 		diff = 0.0
