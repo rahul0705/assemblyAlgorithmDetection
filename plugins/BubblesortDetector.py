@@ -12,9 +12,8 @@ def color_block (bb, color):
 def replaceRegisters(str):
     for x in registerList:
         if (str.find(x) != -1):
-            str = str.replace(x, getRegister(x))
+                str = str.replace(x, getRegister(x))
     return str
-
 
 def printRegisters():
     for x in registerList:
@@ -111,7 +110,6 @@ for block in fc:
     while True:
         try:
             head = it.next()
-
             mnem = GetMnem(head)
             op1 = GetOpnd(head, 0)
             op2 = GetOpnd(head, 1)
@@ -125,10 +123,12 @@ for block in fc:
 
             op1 = GetOpnd(last, 0)
             op2 = GetOpnd(last, 1)
-                
+            print op1 + " " + op2
             op1 = replaceRegisters(getRegister(op1))
             op2 = replaceRegisters(getRegister(op2))
-            #print op1 + " " + op2
+            print op1 + " " + op2
+            print graphy
+
             if (op1 != op2 and find_path(graphy, op1, op2) != None and find_path(graphy, op2, op1) != None):
                 print "\nBLOCK: %x [%d]: Is a Swap" % (block.startEA, block.id)
                 color_block(block, 0xAEBAEB)
@@ -154,7 +154,6 @@ for block in fc:
                         for blk in loop_starts:
                             print "Starts Loop: %x [%d] -> Ends Loop:%x [%d]" % (loop_endings[index].startEA, loop_endings[index].id, blk.startEA, blk.id,)
                             index = index + 1
-
 
 
                         loopcount = 0
@@ -190,16 +189,27 @@ for block in fc:
 
         elif (mnem == "mov"):
             if (isRegister(op1)):
-                setRegister(op1, op2)
+                op2 = replaceRegisters(op2)
+
+                if (op2[0] == '[' and op1 == "eax" and op2.find("eax") != -1):
+                    print op1 + " :" + op2
+                    
+                    setRegister(op1, op1)
+                else:
+                    setRegister(op1, op2)
+                
             else:
                 if (isRegister(op2)):
                     last = head
                     op1 = replaceRegisters(getRegister(op1))
                     op2 = replaceRegisters(getRegister(op2))
-                    #print graphy
-                    #print "Adding Node Between" + op1 + " " + op2
+
                     addNode(op1, op2)
-                    #printRegisters()
+                        #printRegisters()
+                else: 
+                    print "OH NO"
+            
+
         elif (mnem == "add"):
             setRegister(op1, op1 + "+" + op2)
         elif (mnem == "sub"):
@@ -208,10 +218,23 @@ for block in fc:
             valint = int(op2) * 2
             valstr = str(valint)
             setRegister(op1, op1 + "*" + valstr)
+        elif (mnem == "lea"):
+            op2 = replaceRegisters(getRegister(op2))
+            setRegister(op1, op2)
 
 
 for e in G.E:
     if e.status is 2:
-        #e.printEdge()
-        color_block(e.srcV.block, 0x0000FF)
-        color_block(e.dstV.block, 0x00FF00)
+    #e.printEdge()
+        #color_block(e.srcV.block, 0x0000FF)
+        #color_block(e.dstV.block, 0x00FF00)
+        
+        if e.srcV.block.id is e.dstV.block.id:
+            for head in Heads(e.srcV.block.startEA, e.srcV.block.endEA):
+                SetColor(head, CIC_ITEM, 0xFF0000)
+        else:
+            for head in Heads(e.srcV.block.startEA, e.srcV.block.endEA):
+                SetColor(head, CIC_ITEM, 0x0000FF)
+                                                    
+            for head in Heads(e.dstV.block.startEA, e.dstV.block.endEA):
+                SetColor(head, CIC_ITEM, 0x00FF00)
