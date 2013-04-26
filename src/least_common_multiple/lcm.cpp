@@ -1,5 +1,9 @@
 #include <iostream>
 #include <numeric>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
 
 int gcd(int a, int b)
 {
@@ -21,12 +25,13 @@ int lcm(int a, int b)
 
 int main()
 {
-    int arr[] = { 5, 7, 9, 12 };
+	srand(time(NULL));
+	int x = rand() & 255;
+	int y = rand() & 255;
 
-    //int result = std::accumulate(arr, arr + 4, 1, lcm);
-	int result = lcm(5, 7);
+	int result = lcm(x, y);
 
-    std::cout << result << '\n';
+    cout << "x: " << x << ", y: " << y << ", lcm(x,y): " << result << '\n';
 	system("pause");
 }
 
