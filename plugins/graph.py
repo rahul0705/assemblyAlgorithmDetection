@@ -100,6 +100,10 @@ class graph:
 					edge.srcV.label = 1
 					edge.dstV.label = 2
 					
+					for e in edge.dstV.backAdjList:
+						if e.dstV == edge.srcV:
+							e.status = 2
+					
 	def colorBackEdges(self):
 		for e in self.E:
 			if e.status is 2:

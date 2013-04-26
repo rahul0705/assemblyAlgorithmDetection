@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdlib>
-#include <unistd.h>
+//#include <unistd.h>
 #include <stdio.h>
 #include <iostream>
 
@@ -9,11 +9,18 @@ using namespace std;
 
 void quickSort(int *arr, int elements);
 
-int main()
+/*int main()
 {
-	int x[] = {31,28,31,98,78,34,9264,27506,3624,2,6,8,4,3859};
-	quickSort(x,14);
-}
+	int x[] = {31,28,31,98,78,154333,12,11,34,123,3,56,9264,27506,3624,2,6,8,4,3859};
+
+	quickSort(x,20);
+
+	for(int i = 0; i < 20; i++){
+		cout << x[i] << " ";
+	}
+
+	system("pause");
+}*/
 
 void quickSort(int *arr, int elements) {
 
