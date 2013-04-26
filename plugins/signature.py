@@ -7,6 +7,22 @@ from sys import *
 
 DIR = "C:\\Users\\gbrinzea\\Desktop\\CS490PRE\\repo\\trunk\\plugins"
 
+class result:
+	def __init__(self, alg, cmp, opt, sim):
+		self.alg = alg
+		self.cmp = cmp
+		self.opt = opt
+		self.sim = sim
+		
+	def __cmp__(self, other):
+		if self.sim < other.sim:
+			return 1
+		elif self.sim > other.sim:
+			return -1
+		else:
+			return 0
+
+
 class signature:
 	def __init__(self, FC, G):
 		self.sigVector = {}
@@ -137,6 +153,7 @@ class signature:
 			if file[0] != '.':
 				sigLoaded = signature(None, None)
 				sigLoaded.load(file)
-				similarities.append([sigLoaded.algorithm, sigLoaded.compiler, sigLoaded.optimization, sigLoaded.compareLoaded(self)])
+				similarities.append(result(sigLoaded.algorithm, sigLoaded.compiler, sigLoaded.optimization, sigLoaded.compareLoaded(self)))
+				del sigLoaded
 		
 		return similarities
