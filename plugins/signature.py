@@ -25,6 +25,8 @@ class result:
 
 class signature:
 	def __init__(self, FC, G):
+		os.chdir(DIR)
+		
 		self.sigVector = {}
 		self.algorithm = ""
 		self.compiler = ""
@@ -54,7 +56,10 @@ class signature:
 			#self.sigVector['block_count'] = len(G.V)
 			#self.sigVector['edge_count'] = len(G.E)
 			
-			self.sigVector['block_to_edge_ratio'] = float(len(G.V)) / len(G.E)
+			if len(G.E) is not 0:
+				self.sigVector['block_to_edge_ratio'] = float(len(G.V)) / len(G.E)
+			else:
+				self.sigVector['block_to_edge_ratio'] = 0
 			
 			self.sigVector['back_edge_count'] = 0
 			for e in G.E:
