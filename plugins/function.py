@@ -6,6 +6,7 @@ from json import *
 from string import *
 from math import *
 from sys import *
+from __future__ import division
 
 def nextPrime(currentPrime):
 	nextPrime = currentPrime + 1
@@ -96,9 +97,9 @@ class function_block:
 		for key in spp.keys():
 			diff = 0.0
 			if spp[key][0] < self.prime:
-				diff = Decimal(spp[key][0])/Decimal(self.prime)
+				diff = spp[key][0]/self.prime
 			elif spp[key][0] > self.prime:
-				diff = Decimal(self.prime)/Decimal(spp[key][0])
+				diff = self.prime/spp[key][0]
 			else:
 				diff = 1
 			if diff >= threshold:
