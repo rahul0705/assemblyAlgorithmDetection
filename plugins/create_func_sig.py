@@ -8,7 +8,7 @@ ea = ScreenEA()
 fc = FlowChart(get_func(ea))
 
 G = graph(fc)	
-sig = signature(fc, G)
+sig = signature(fc, G, False)
 sig.printSig()
 sig.save()
 		

@@ -1,0 +1,17 @@
+Algorithm insertion_sort
+Compiler g++
+Optimization minimum_size
+
+jg 1
+inc 1
+jmp 4
+jge 1
+pop 4
+retn 1
+jl 1
+test 1
+back_edge_count 2
+push 4
+block_to_edge_ratio 0.818181818182
+dec 1
+cmp 2

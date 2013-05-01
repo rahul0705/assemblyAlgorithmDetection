@@ -24,7 +24,7 @@ class result:
 
 
 class signature:
-	def __init__(self, FC, G):
+	def __init__(self, FC, G, compareFlag):
 		os.chdir(DIR)
 		
 		self.sigVector = {}
@@ -33,13 +33,14 @@ class signature:
 		self.optimization = ""
 		
 		if FC is not None and G is not None:
-			filename = get_root_filename()
-		
-			file_components = split(filename, '-')
+			if compareFlag is False:
+				filename = get_root_filename()
 			
-			self.algorithm = file_components[0]
-			self.compiler = (split(file_components[2], '.'))[0]
-			self.optimization = file_components[1]
+				file_components = split(filename, '-')
+				
+				self.algorithm = file_components[0]
+				self.compiler = (split(file_components[2], '.'))[0]
+				self.optimization = file_components[1]
 			
 			for block in FC:
 				for head in Heads(block.startEA, block.endEA):
@@ -125,8 +126,6 @@ class signature:
 			if item not in selfCombinedVector:
 				selfCombinedVector[item] = 0
 			otherCombinedVector[item] = other.sigVector[item]
-			
-		scale = 1
 		
 		dotProduct = 0
 		for item in selfCombinedVector:
@@ -156,7 +155,7 @@ class signature:
 		
 		for file in os.listdir("signatures"):
 			if file[0] != '.':
-				sigLoaded = signature(None, None)
+				sigLoaded = signature(None, None, None)
 				sigLoaded.load(file)
 				similarities.append(result(sigLoaded.algorithm, sigLoaded.compiler, sigLoaded.optimization, sigLoaded.compareLoaded(self)))
 				del sigLoaded
