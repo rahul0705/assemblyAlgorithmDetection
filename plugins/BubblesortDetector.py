@@ -60,7 +60,6 @@ def nested_count(G, block_id, count = 0):
         return nested_count(G, parent.block.id, count)
 
 
-#From the magical land of the internet
 def find_path(graphy, start, end, path=[]):
     path = path + [start]
     if start == end:
@@ -80,7 +79,7 @@ for function in Functions(SegStart(ea), SegEnd(ea)):
     fc = idaapi.FlowChart(func)
 
     reg = {} #Store all the registers
-    graphy = {} #Magical Shit here
+    graphy = {} 
     registerList = ["eax", "ebx", "ecx", "edx", "edi", "esi"] # ebp/esp not needed
 
     G = graph(fc)
