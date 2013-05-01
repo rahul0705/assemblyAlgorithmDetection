@@ -3,8 +3,11 @@ from graph import *
 from signature import *
 
 threshold = 0.85;
+OLDDIR = os.getcwd()
+DIR = ".\\.."
 
 print "\n--------------------\ncompare_func_sig.py has been started\n"
+os.chdir(DIR)
 ea = ScreenEA()
 
 for function in Functions(SegStart(ea), SegEnd(ea)):
@@ -55,3 +58,4 @@ del similarities
 del fc"""
 	
 print "compare_func_sig.py has completed\n--------------------\n"
+os.chdir(OLDDIR)

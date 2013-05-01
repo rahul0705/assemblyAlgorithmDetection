@@ -5,8 +5,6 @@ from string import *
 from math import *
 from sys import *
 
-DIR = "C:\\Users\\gbrinzea\\Desktop\\CS490PRE\\repo\\trunk\\plugins"
-
 class result:
 	def __init__(self, alg, cmp, opt, sim):
 		self.alg = alg
@@ -25,8 +23,6 @@ class result:
 
 class signature:
 	def __init__(self, FC, G, compareFlag):
-		os.chdir(DIR)
-		
 		self.sigVector = {}
 		self.algorithm = ""
 		self.compiler = ""
@@ -67,9 +63,7 @@ class signature:
 				if e.status is 2:
 					self.sigVector['back_edge_count'] = self.sigVector['back_edge_count'] + 1
 			
-	def save(self):
-		os.chdir(DIR)
-		
+	def save(self):	
 		f = open("signatures/" + self.algorithm + "-" + self.optimization + "-" + self.compiler + ".txt", "w")
 		
 		f.write("Algorithm " + self.algorithm + "\n")
@@ -82,8 +76,6 @@ class signature:
 		f.close()
 		
 	def load(self, filename):
-		os.chdir(DIR)
-	
 		f = open("signatures/" + filename, "r")
 		lines = f.readlines()
 		f.close()

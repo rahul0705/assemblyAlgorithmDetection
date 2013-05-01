@@ -1,0 +1,18 @@
+Algorithm insertion_sort
+Compiler g++
+Optimization unoptimized
+
+leave 1
+block_to_edge_ratio 0.785714285714
+sub 4
+setl 1
+jnz 2
+jmp 3
+retn 1
+jle 2
+test 2
+add 6
+back_edge_count 2
+push 1
+shl 5
+cmp 3

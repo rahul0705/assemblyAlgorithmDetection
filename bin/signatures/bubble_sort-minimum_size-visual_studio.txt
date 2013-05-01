@@ -1,0 +1,20 @@
+Algorithm bubble_sort
+Compiler visual_studio
+Optimization minimum_size
+
+lea 3
+dec 1
+xor 3
+sub 1
+jnz 1
+retn 1
+pop 4
+jl 2
+call 1
+leave 1
+push 6
+block_to_edge_ratio 0.75
+jle 1
+cmp 3
+back_edge_count 3
+inc 3

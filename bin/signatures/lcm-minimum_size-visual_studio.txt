@@ -1,0 +1,26 @@
+Algorithm lcm
+Compiler visual_studio
+Optimization minimum_size
+
+and 4
+jnz 6
+back_edge_count 6
+inc 1
+xor 2
+sub 2
+retn 1
+add 3
+call 8
+adc 2
+test 3
+lea 3
+jz 3
+jmp 5
+jl 4
+block_to_edge_ratio 0.62
+jg 4
+sbb 1
+jbe 3
+push 10
+or 3
+cmp 13

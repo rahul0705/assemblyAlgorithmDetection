@@ -1,0 +1,19 @@
+Algorithm quicksort
+Compiler visual_studio
+Optimization unoptimized
+
+jle 1
+xor 2
+sub 7
+jmp 5
+jge 6
+pop 2
+retn 1
+jl 2
+add 4
+call 1
+push 2
+block_to_edge_ratio 0.709677419355
+jg 1
+back_edge_count 4
+cmp 10
