@@ -62,7 +62,7 @@ class block:
 
 class function_block:
 	def __init__(self, FC, G, flag = True):
-		self.ops = load(open("../ops.txt"))
+		self.ops = load(open("primes/ops.txt"))
 		self.instructions = 0
 		currentPrime = 2;
 		for key in self.ops.keys():
@@ -92,10 +92,10 @@ class function_block:
 				self.prime *= self.blocks[id]
 	
 	def save(self):
-		spp = load(open("../spp.txt"))
+		spp = load(open("primes/spp.txt"))
 		spp[str(self)] = [self.prime, self.blocks, self.instructions]
-		dump(self.ops, open("../ops.txt", "w"), sort_keys = True, indent = 2)
-		dump(spp, open("../spp.txt", "w"), sort_keys = True, indent = 2)
+		dump(self.ops, open("primes/ops.txt", "w"), sort_keys = True, indent = 2)
+		dump(spp, open("primes/spp.txt", "w"), sort_keys = True, indent = 2)
 
 	def printSPP(self):
 		print "Algorithm: %s" % (self.algorithm)
@@ -110,7 +110,7 @@ class function_block:
 			print "%s: %d" % (item, self.blocks[item])
 
 	def exactCompare(self):
-		spp = load(open("../spp.txt"))
+		spp = load(open("primes/spp.txt"))
 		ret = {}
 		for key in spp.keys():
 			diff = 0.0
@@ -125,8 +125,8 @@ class function_block:
 		return ret
 
 	def compare(self, threshold=.10):
-		spp = load(open("../spp.txt"))
-		ops = load(open("../ops.txt"))
+		spp = load(open("primes/spp.txt"))
+		ops = load(open("primes/ops.txt"))
 		avgPrime = 0
 		for key in ops.keys():
 			avgPrime += ops[key]
@@ -139,7 +139,7 @@ class function_block:
 		return ret
 		
 	def compareBlocks(self, threshold=.55):
-		spp = load(open("../spp.txt"))
+		spp = load(open("primes/spp.txt"))
 		ret = {}
 		for key in spp.keys():
 			blocks = spp[key][1]

@@ -5,8 +5,10 @@ from string import *
 from graph import *
 from function import *
 
+OLDDIR = os.getcwd()
+DIR = ".\\.."
 print "\n--------------------\ncompare_func_spp.py has been started"
-
+os.chdir(DIR)
 ea = ScreenEA()
 
 # Loop through all the functions
@@ -40,3 +42,4 @@ for function_ea in Functions(SegStart(ea), SegEnd(ea)):
 	del similarities
 	del fc
 print "compare_func_spp.py has completed\n--------------------\n"
+os.chdir(OLDDIR)

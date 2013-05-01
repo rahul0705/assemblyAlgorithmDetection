@@ -20,7 +20,6 @@ class result:
 		else:
 			return 0
 
-
 class signature:
 	def __init__(self, FC, G, compareFlag):
 		self.sigVector = {}

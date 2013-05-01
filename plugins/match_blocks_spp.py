@@ -5,8 +5,11 @@ from string import *
 from graph import *
 from function import *
 
-print "\n--------------------\nmatch_blocks_spp.py has been started"
+OLDDIR = os.getcwd()
+DIR = ".\\.."
 
+print "\n--------------------\nmatch_blocks_spp.py has been started"
+os.chdir(DIR)
 ea = ScreenEA()
 
 # Loop through all the functions
@@ -30,3 +33,4 @@ for function_ea in Functions(SegStart(ea), SegEnd(ea)):
 	del matchingBlocks
 	del fc
 print "match_blocks_spp.py has completed\n--------------------\n"
+os.chdir(OLDDIR)
